@@ -7,3 +7,17 @@ function showPicture(){
   // jQuery can do a lot of crazy stuff, so make sure to Google around to find out more
   
 }
+
+function handleSignIn() {
+  firebase.auth().signInWithEmailAndPassword(email, password)
+  .then((user) => {
+    // Signed in 
+    // ...
+  })
+  .catch((error) => {
+    var errorCode = error.code;
+    var errorMessage = error.message;
+  });
+  
+  console.log(user.email)
+}
