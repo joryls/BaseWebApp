@@ -8,7 +8,7 @@
   
 } */
 
-function handleSignIn() {
+function handleSignIn(email, pwd) {
   firebase.auth().signInWithEmailAndPassword(email, pwd)
   .then((user) => {
     // Signed in 
