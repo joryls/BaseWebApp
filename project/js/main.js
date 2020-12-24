@@ -8,6 +8,7 @@ var userId = firebase.auth().currentUser.uid;
     var username = (snapshot.val() && snapshot.val().username) || 'Anonymous';
   }))
 
+
 ref.once("value", function(data) {
     // do some stuff once
   });
