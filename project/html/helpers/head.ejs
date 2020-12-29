@@ -56,10 +56,10 @@ ui.start('#firebaseui-auth-container', uiConfig);
 firebase.auth().onAuthStateChanged(function(user) {
   if (user) {
     // User is signed in.
-    //console.log(user+" signed in");
+    console.log(user+" signed in");
   } else {
     // No user is signed in.
-    //console.log("signed out");
+    console.log("signed out");
   }
 });
 </script>

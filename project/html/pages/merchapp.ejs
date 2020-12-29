@@ -4,14 +4,72 @@
 
 <SCRIPT LANGUAGE=javascript>
 
-function OnChange(dropdown)  {
-  var myindex  = dropdown.selectedIndex
-  var SelValue = dropdown.options[myindex].value
-  //var baseURL  = SelValue
-  //top.location.href = baseURL;
-  document.getElementById("dataHere").innerHTML = "The data for the " + SelValue +" store will go here."
+  function OnChange(dropdown)  {
+    var myindex  = dropdown.selectedIndex
+    var SelValue = dropdown.options[myindex].value
+    //var baseURL  = SelValue
+    //top.location.href = baseURL;
+
+    var dbRef = firebase.database().ref('data');
+    
+    //get list of db index
+    document.getElementById('commentsHere').innerHTML = "";
+
+    var query = dbRef.orderByKey();
+    query.once('value')
+      .then(function(snapshot) {
+        snapshot.forEach(function(childSnapshot) {
+          var key = childSnapshot.key;
+          var childData = childSnapshot.val();
+          var store = childData.Store;
+          var prodName = document.createElement("p")
+          if (store == SelValue)  {
+            let item = childData.Name + " (" + childData.UPC + ") sold " + childData.UnitSales + " units"
+            //let $li = document.createElement("li");
+            prodName.innerHTML = item;
+            prodName.setAttribute("child-key", childData.UPC);
+            document.getElementById('commentsHere').appendChild(prodName);
+            //console.log(childData.Name + " (" + childData.UPC + ") sold " + childData.UnitSales + " units");
+          } 
+        })
+      })
+
+    
+    
+    console.log(dbRef);
+    //for each dex in list create ref
+    //var dbRef = dbRef.child(dex);
+
+
+    //var dataList = document.getElementById('CommentsHere');
+    /* dbRef.child.once('value')
+     .then(function(snapshot) {
+      //snapshot.forEach(function(childSnapshot) {
+        var key = snapshot.key;
+        //var childData = childSnapshot.Store;
+        console.log(key);
+      }) */
+      /* let data = key;
+      let $li = document.createElement("li");
+      $li.innerHTML = data; */
+      //console.log(data);
+
+  var userId = firebase.auth().currentUser.uid;
+/*   console.log(firebase.database().ref('/users/' + userId).once('value').then((snapshot) => {
+    var username = (snapshot.val() && snapshot.val().username) || 'Anonymous';
+  })) */
+
+
+/* ref.once("value", function(data) {
+    // do some stuff once
+  }); */
+
+  //document.getElementById("dataHere").innerHTML = "The data for the " + SelValue +" store will go here.";
+  //console.log(SelValue);
+
+/*   document.getElementById("commentsHere").innerHTML = "user is: " + userId;
+  console.log(userID); */
   
-  console.log(SelValue);
   return true;
 }
 </SCRIPT>
@@ -33,7 +91,7 @@ function OnChange(dropdown)  {
     <h1>Content Cubed Test App</h1>
 
     <form>
-      <select name="stores" id="stores" onchange='OnChange(this.form.stores);'>
+      <select name="stores" id="stores" onchange='OnChange(this.form.stores)'>
         <option value="Choose Store">Choose Store</option>
         <option value="50th Street Edina">50th Street Edina</option>
         <option value="Bloomington">Bloomington</option>
@@ -66,6 +124,22 @@ function OnChange(dropdown)  {
     </form>
 
   <div id="dataHere">
+    <SCRIPT LANGUAGE=javascript>
+
+    /* var lfhidata = firebase.database();
+    console.log(lfhidata); */
+
+    var userId = firebase.auth().currentUser.userId;
+    console.log(userId);
+
+    </script>
+
+
+  </div>
+
+
+  <div id="commentsHere">
+
   </div>
 
 
