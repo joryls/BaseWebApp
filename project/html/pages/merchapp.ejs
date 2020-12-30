@@ -12,34 +12,91 @@
 
     var dbRef = firebase.database().ref('data');
     
-    //get list of db index
-    document.getElementById('commentsHere').innerHTML = "";
+    
+    //clear previously selected store data
+    document.getElementById('dataHere').innerHTML = "";
 
+
+    //get list of dbobject by Key
     var query = dbRef.orderByKey();
+
+    var lnbreak = document.createElement("br");
+    var para = document.createElement("p");
+    var para2 = document.createElement("p");
+    var para3 = document.createElement("p");
+    para.innerHTML = "Product Name (UPC) and Units Sold";
+    para2.style = "p2"
+    para2.innerHTML = "On Shelf?";
+    para3.style = "p2"
+    para3.innerHTML = "In Stock?";
+    document.getElementById('headHere').appendChild(para);
+    document.getElementById('headHere').appendChild(para2);
+    document.getElementById('headHere').appendChild(para3);
+    document.getElementById('headHere').appendChild(lnbreak);
+
+    //iterate through where store matches selected add products to list
+    //create list item, checkboxes <TODO> and publish to UI.
     query.once('value')
       .then(function(snapshot) {
         snapshot.forEach(function(childSnapshot) {
           var key = childSnapshot.key;
           var childData = childSnapshot.val();
           var store = childData.Store;
-          var prodName = document.createElement("p")
+          var prodName = document.createElement("p");
+          var linebreak = document.createElement("br");
+
           if (store == SelValue)  {
             let item = childData.Name + " (" + childData.UPC + ") sold " + childData.UnitSales + " units"
-            //let $li = document.createElement("li");
+            let ckbx = document.createElement("input");
+            ckbx.id = "slf"+childData.UPC;
+            ckbx.type = "checkbox";
+            let ckbx2 = document.createElement("input");
+            ckbx2.id = "stk"+childData.UPC;
+            ckbx2.type = "checkbox";
             prodName.innerHTML = item;
+            //.appendChild('<input type="checkbox">');
+            //prodName.insertAdjacentHTML('beforeend', ckbx);
             prodName.setAttribute("child-key", childData.UPC);
-            document.getElementById('commentsHere').appendChild(prodName);
-            //console.log(childData.Name + " (" + childData.UPC + ") sold " + childData.UnitSales + " units");
+            document.getElementById('dataHere').appendChild(linebreak);
+            document.getElementById('dataHere').appendChild(prodName);
+            document.getElementById('dataHere').appendChild(ckbx);
+            document.getElementById('dataHere').appendChild(ckbx2);
           } 
         })
       })
 
-    
-    
-    console.log(dbRef);
-    //for each dex in list create ref
-    //var dbRef = dbRef.child(dex);
+      document.getElementById('dataHere').appendChild(lnbreak);
 
+
+    //create text inputs for comments
+    var userId = firebase.auth().currentUser.uid;
+    console.log(userId);
+
+    var priceComm = document.createElement("input");
+    priceComm.id = "price"+userId;
+    priceComm.type = "text";
+    priceComm.size = 80;
+
+    var presComm = document.createElement("input");
+    presComm.id = "pres"+userId;
+    presComm.type = "text";
+    presComm.size = 80;
+    
+    var para4 = document.createElement("p");
+    var para5 = document.createElement("p");
+    para4.innerHTML = "Note any pricing issues here:"
+    para5.innerHTML = "Note any presentation issues here:"
+
+    document.getElementById('commentsHere').appendChild(para4);
+    document.getElementById('commentsHere').appendChild(lnbreak);   
+    document.getElementById('commentsHere').appendChild(priceComm);
+    document.getElementById('commentsHere').appendChild(lnbreak);
+    document.getElementById('commentsHere').appendChild(para5);
+    document.getElementById('commentsHere').appendChild(lnbreak); 
+    document.getElementById('commentsHere').appendChild(presComm);
+    document.getElementById('commentsHere').appendChild(lnbreak);
+
+    //console.log(dbRef);
 
     //var dataList = document.getElementById('CommentsHere');
     /* dbRef.child.once('value')
@@ -54,7 +111,6 @@
       $li.innerHTML = data; */
       //console.log(data);
 
-  var userId = firebase.auth().currentUser.uid;
 /*   console.log(firebase.database().ref('/users/' + userId).once('value').then((snapshot) => {
     var username = (snapshot.val() && snapshot.val().username) || 'Anonymous';
   })) */
@@ -74,19 +130,12 @@
 }
 </SCRIPT>
 
-<!-- <script type="text/javascript">
-
-  document.getElementById(SelValue) = SelValue;
-
-</script> -->
-
 </head>
 
 <body>
   <!-- the classes 'page-header' and 'btn btn-dark' create bootstrap components.  -->
   <!-- Check out more components here: http://getbootstrap.com/components/ -->
   <div class="page-header">
-
   
     <h1>Content Cubed Test App</h1>
 
@@ -123,23 +172,18 @@
       </select>
     </form>
 
+  <div id="headHere">
+  
+  </div>
+
   <div id="dataHere">
-    <SCRIPT LANGUAGE=javascript>
-
-    /* var lfhidata = firebase.database();
-    console.log(lfhidata); */
-
-    var userId = firebase.auth().currentUser.userId;
-    console.log(userId);
-
-    </script>
-
 
   </div>
 
+  <br>
 
   <div id="commentsHere">
-
+  
   </div>
 
 
