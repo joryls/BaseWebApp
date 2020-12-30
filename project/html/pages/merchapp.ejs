@@ -7,19 +7,17 @@
   function OnChange(dropdown)  {
     var myindex  = dropdown.selectedIndex
     var SelValue = dropdown.options[myindex].value
-    //var baseURL  = SelValue
-    //top.location.href = baseURL;
 
+    //access database
     var dbRef = firebase.database().ref('data');
     
-    
-    //clear previously selected store data
+    //clear previously selected store data if present
     document.getElementById('headHere').innerHTML = "";
     document.getElementById('dataHere').innerHTML = "";
     document.getElementById('commentsHere').innerHTML = "";
 
-    //get list of dbobject by Key
-    var query = dbRef.orderByKey();
+    //get list of dbobject by Category
+    var query = dbRef.orderByChild("Category");
 
     var lnbreak = document.createElement("br");
     var para = document.createElement("p");
@@ -77,11 +75,13 @@
     priceComm.id = "price"+userId;
     priceComm.type = "text";
     priceComm.size = 80;
+    //priceComm.float = "left";
 
     var presComm = document.createElement("input");
     presComm.id = "pres"+userId;
     presComm.type = "text";
     presComm.size = 80;
+    //presComm.float = "left";
     
     var para4 = document.createElement("p");
     var para5 = document.createElement("p");
