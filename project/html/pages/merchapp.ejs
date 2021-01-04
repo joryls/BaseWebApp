@@ -4,14 +4,26 @@
 
 <SCRIPT LANGUAGE=javascript>
 
+  //access database
+  var dbRef = firebase.database().ref('data');
+
   function OnChange(dropdown)  {
-    var myindex  = dropdown.selectedIndex
-    var SelValue = dropdown.options[myindex].value
+    //exception handling for when dropdown list is removed
+    try {
+      var myindex  = dropdown.selectedIndex;
+    }
+
+    catch ( e ) {
+         // Code to run if an exception occurs
+         return;
+    }
+    var SelValue = dropdown.options[myindex].value;
 
     //access database
-    var dbRef = firebase.database().ref('data');
+    //var dbRef = firebase.database().ref('data');
     
     //clear previously selected store data if present
+    document.getElementById('clicker').innerHTML = "";
     document.getElementById('headHere').innerHTML = "";
     document.getElementById('dataHere').innerHTML = "";
     document.getElementById('commentsHere').innerHTML = "";
@@ -19,28 +31,37 @@
     //get list of dbobject by Category
     var query = dbRef.orderByChild("Category");
 
+    var pushme = document.createElement("input");
+    pushme.id = "confirm"
+    pushme.type = "button";
+    pushme.value = "Done";
+    pushme.onclick = OnClick;
+    document.getElementById('clicker').append(pushme);
+    //pushme.onclick = OnClick();
+    
+
     var lnbreak = document.createElement("br");
-    var para = document.createElement("p");
-    var para2 = document.createElement("p");
-    var para3 = document.createElement("p");
+    var para = document.createElement("h2");
+    var para2 = document.createElement("h2");
+    var para3 = document.createElement("h2");
     para.innerHTML = "Product Name (UPC) and Units Sold";
-    para2.style = "p2"
     para2.innerHTML = "On Shelf?";
-    para3.style = "p2"
     para3.innerHTML = "In Stock?";
     document.getElementById('headHere').appendChild(para);
     document.getElementById('headHere').appendChild(para2);
     document.getElementById('headHere').appendChild(para3);
-    document.getElementById('headHere').appendChild(lnbreak);
+    //document.getElementById('headHere').appendChild(lnbreak);
 
+    let currcat = "";
     //iterate through where store matches selected add products to list
-    //create list item, checkboxes <TODO> and publish to UI.
+    //create list item, checkboxes and publish to UI.
     query.once('value')
       .then(function(snapshot) {
         snapshot.forEach(function(childSnapshot) {
           var key = childSnapshot.key;
           var childData = childSnapshot.val();
           var store = childData.Store;
+          var category = childData.Category;
           var prodName = document.createElement("p");
           var linebreak = document.createElement("br");
 
@@ -53,10 +74,22 @@
             ckbx2.id = "stk"+childData.UPC;
             ckbx2.type = "checkbox";
             prodName.innerHTML = item;
-            //.appendChild('<input type="checkbox">');
-            //prodName.insertAdjacentHTML('beforeend', ckbx);
             prodName.setAttribute("child-key", childData.UPC);
+            prodName.setAttribute("name", childData.Name);
             document.getElementById('dataHere').appendChild(linebreak);
+            //build category labels
+            if (currcat != childData.Category) {
+              console.log(currcat);
+              console.log(childData.Category);
+              let catlabel = document.createElement("h3");
+              catlabel.innerHTML = childData.Category;
+              currcat = childData.Category;
+              //document.getElementById('dataHere').appendChild(linebreak);
+              document.getElementById('dataHere').appendChild(catlabel);
+            } else {
+              //do nothing;
+            }
+
             document.getElementById('dataHere').appendChild(prodName);
             document.getElementById('dataHere').appendChild(ckbx);
             document.getElementById('dataHere').appendChild(ckbx2);
@@ -69,7 +102,7 @@
 
     //create text inputs for comments
     var userId = firebase.auth().currentUser.uid;
-    console.log(userId);
+    //console.log(userId);
 
     var priceComm = document.createElement("input");
     priceComm.id = "price"+userId;
@@ -83,8 +116,8 @@
     presComm.size = 80;
     //presComm.float = "left";
     
-    var para4 = document.createElement("p");
-    var para5 = document.createElement("p");
+    var para4 = document.createElement("h2");
+    var para5 = document.createElement("h2");
     para4.innerHTML = "Note any pricing issues here:"
     para5.innerHTML = "Note any presentation issues here:"
 
@@ -96,39 +129,114 @@
     document.getElementById('commentsHere').appendChild(lnbreak); 
     document.getElementById('commentsHere').appendChild(presComm);
     document.getElementById('commentsHere').appendChild(lnbreak);
-
-    //console.log(dbRef);
-
-    //var dataList = document.getElementById('CommentsHere');
-    /* dbRef.child.once('value')
-     .then(function(snapshot) {
-      //snapshot.forEach(function(childSnapshot) {
-        var key = snapshot.key;
-        //var childData = childSnapshot.Store;
-        console.log(key);
-      }) */
-      /* let data = key;
-      let $li = document.createElement("li");
-      $li.innerHTML = data; */
-      //console.log(data);
-
-/*   console.log(firebase.database().ref('/users/' + userId).once('value').then((snapshot) => {
-    var username = (snapshot.val() && snapshot.val().username) || 'Anonymous';
-  })) */
-
-
-/* ref.once("value", function(data) {
-    // do some stuff once
-  }); */
-
-  //document.getElementById("dataHere").innerHTML = "The data for the " + SelValue +" store will go here.";
-  //console.log(SelValue);
-
-/*   document.getElementById("commentsHere").innerHTML = "user is: " + userId;
-  console.log(userID); */
+    }
   
-  return true;
-}
+  function OnClick2(button) {
+    //log user out of firebase
+    firebase.auth().signOut();
+    //clear all elements
+    document.getElementById('storelist').innerHTML = "You are logged out, you may close the app.";
+    document.getElementById('clicker').innerHTML = "";
+    document.getElementById('headHere').innerHTML = "";
+    document.getElementById('dataHere').innerHTML = "";
+    document.getElementById('commentsHere').innerHTML = "";
+    
+  }
+
+  function OnClick(button) {
+    //declare func variables
+    /* var dataobject = {"schema":{"fields":[{"name":"product","type":"string"},
+      {"name":"onshelf","type":"boolean"},
+      {"name":"instock","type":"boolean"}],"pandas_version":"0.20.0"},"visit":[]}; */
+
+    /* const dropdown = document.getElementById("storelist");  
+    var myindex  = dropdown.selectedIndex;
+    var SelValue = dropdown.options[myindex].value; */  
+
+    var dataobject = [];
+
+    var data = document.getElementById("dataHere");
+    var comm = document.getElementById("commentsHere");
+
+    var dataprod = data.getElementsByTagName("p");
+    var datalmts = data.getElementsByTagName("input");
+    var commlmts = comm.getElementsByTagName("input");
+    var pl = dataprod.length;
+    var dl = datalmts.length;
+    var cl = commlmts.length;
+
+    //collect input data in object maybe JSON???
+    //access html elments, extract contained data, and arrange
+    let j = 0;
+    for (i = 0; i < pl; i++) {
+      var obj = { name: dataprod[i].getAttribute('name'),
+                  product: dataprod[i].getAttribute('child-key'),
+                  instock: datalmts[j].checked,
+                  onshelf: datalmts[j+1].checked };
+                  j += 2
+      dataobject.push(obj);
+    }
+    //console.log(datalmts);
+    console.log(dataobject);
+ 
+    //clear previous view data
+    document.getElementById('storelist').innerHTML = "Products to order:";
+    document.getElementById('clicker').innerHTML = "";
+    document.getElementById('headHere').innerHTML = "";
+    document.getElementById('dataHere').innerHTML = "";
+    document.getElementById('commentsHere').innerHTML = "";
+
+    //publish new data for ordering view
+    var pushme2 = document.createElement("input");
+    pushme2.id = "confirmorder"
+    pushme2.type = "button";
+    pushme2.value = "Done";
+    pushme2.onclick = OnClick2;
+    document.getElementById('clicker').append(pushme2);
+
+    var lnbreak = document.createElement("br");
+    var para = document.createElement("h2");
+    var para2 = document.createElement("h2");
+    var para3 = document.createElement("h2");
+    para.innerHTML = "Product Name";
+    para2.innerHTML = "UPC/SKU";
+    para3.innerHTML = "Ordered?";
+    document.getElementById('headHere').appendChild(para);
+    document.getElementById('headHere').appendChild(para2);
+    document.getElementById('headHere').appendChild(para3);
+    document.getElementById('headHere').appendChild(lnbreak);
+
+    
+    var pl = dataobject.length
+    for (i = 0; i < pl; i++) {
+      //console.log(item);
+      if (dataobject[i].instock == false)  {
+            let line = dataobject[i].name + " (" + dataobject[i].product + ")";
+            //console.log(line)
+            let prodName = document.createElement("p");
+            let ckbx = document.createElement("input");
+            let linebreak = document.createElement("br");
+            ckbx.id = "ord"+dataobject[i].product;
+            ckbx.type = "checkbox";
+            prodName.innerHTML = line;
+            //console.log(prodName);
+            prodName.setAttribute("child-key", dataobject[i].product);
+            prodName.setAttribute("name", dataobject[i].name);
+            document.getElementById('dataHere').appendChild(prodName);
+            document.getElementById('dataHere').appendChild(ckbx);
+            document.getElementById('dataHere').appendChild(linebreak);
+          } 
+        }
+
+      //document.getElementById('dataHere').appendChild(lnbreak);
+
+    //access database
+    
+
+    //write data to db
+
+
+  }
 </SCRIPT>
 
 </head>
@@ -140,7 +248,11 @@
   
     <h1>Content Cubed Test App</h1>
 
-    <form>
+    <form id="clicker">
+
+    </form>
+
+    <form id="storelist">
       <select name="stores" id="stores" onchange='OnChange(this.form.stores)'>
         <option value="Choose Store">Choose Store</option>
         <option value="50th Street Edina">50th Street Edina</option>
