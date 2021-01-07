@@ -56,12 +56,12 @@ p {
   font-family: Arial, Helvetica, sans-serif;
   text-align: left;
   color: black;
-  font-size: 24px;
+  font-size: 22px;
   text-indent: 50px;
   float: none;
   overflow: hidden;
   max-width: 85%;
-  max-height: 24px;
+  max-height: 22px;
   padding-top: 5px;
   padding-bottom: 5px;
 }
