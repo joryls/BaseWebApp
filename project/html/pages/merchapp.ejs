@@ -48,8 +48,8 @@
     para2.innerHTML = "ON SHELF";
     para3.innerHTML = "IN STOCK";
     document.getElementById('labels').appendChild(para);
-    document.getElementById('labels').appendChild(para2);
     document.getElementById('labels').appendChild(para3);
+    document.getElementById('labels').appendChild(para2);
     //document.getElementById('headHere').appendChild(lnbreak);
 
     let currcat = "";
@@ -63,7 +63,6 @@
           var store = childData.Store;
           var category = childData.Category;
           var prodName = document.createElement("p");
-          var linebreak = document.createElement("br");
 
           //build category labels
           if (currcat != childData.Category) {
