@@ -121,8 +121,8 @@ input[type=checkbox] {
   height: 24px;
   width: 24px;
   border-radius: 5px;
-  padding-top: 5px;
-  padding-bottom: 5px;
+  padding-top: 15px;
+  padding-bottom: 0px;
 }
 
 input[type=button] {
