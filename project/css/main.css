@@ -116,10 +116,10 @@ input[type=checkbox] {
   display: inline;
   float: right;
   margin-right: 40px;
-  margin-top: 0px;
+  margin-top: 15px;
   margin-bottom: 0px;
-  height: 24px;
-  width: 24px;
+  height: 28px;
+  width: 28px;
   border-radius: 5px;
   padding-top: 15px;
   padding-bottom: 0px;
