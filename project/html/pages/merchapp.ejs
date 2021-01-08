@@ -42,11 +42,11 @@
 
     var lnbreak = document.createElement("br");
     var para = document.createElement("h2");
-    var para2 = document.createElement("h2");
-    var para3 = document.createElement("h2");
+    var para2 = document.createElement("h4");
+    var para3 = document.createElement("h4");
     para.innerHTML = "Product Name (UPC) and Units Sold";
-    para2.innerHTML = "On Shelf?";
-    para3.innerHTML = "In Stock?";
+    para2.innerHTML = "ON SHELF";
+    para3.innerHTML = "IN STOCK";
     document.getElementById('labels').appendChild(para);
     document.getElementById('labels').appendChild(para2);
     document.getElementById('labels').appendChild(para3);
@@ -76,7 +76,7 @@
             }
 
           if (store == SelValue)  {
-            let item = childData.Name + " (" + childData.UPC + ") sold " + childData.UnitSales + "   . . . . . . . . . . . . . . . . . . . . . . . . . . . . ";
+            let item = childData.Name + " (" + childData.UPC + ") sold " + childData.UnitSales + "   . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ";
             let ckbx = document.createElement("input");
             ckbx.id = "slf"+childData.UPC;
             ckbx.type = "checkbox";
@@ -185,20 +185,17 @@
 
     var lnbreak = document.createElement("br");
     var para = document.createElement("h2");
-    var para2 = document.createElement("h2");
-    var para3 = document.createElement("h2");
-    para.innerHTML = "Product Name";
-    para2.innerHTML = "UPC/SKU";
-    para3.innerHTML = "Ordered?";
+    var para3 = document.createElement("h5");
+    para.innerHTML = "Product Name (UPC/SKU)";
+    para3.innerHTML = "Ordered";
     document.getElementById('labels').appendChild(para);
-    document.getElementById('labels').appendChild(para2);
     document.getElementById('labels').appendChild(para3);
     
     var pl = dataobject.length
     for (i = 0; i < pl; i++) {
       //console.log(item);
       if (dataobject[i].instock == false)  {
-            let line = dataobject[i].name + " (" + dataobject[i].product + ")   . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ";
+            let line = dataobject[i].name + " (" + dataobject[i].product + ")   . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ";
             let prodName = document.createElement("p");
             let ckbx = document.createElement("input");
             let linebreak = document.createElement("br");
@@ -225,7 +222,7 @@
 <body>
   <!-- the classes 'page-header' and 'btn btn-dark' create bootstrap components.  -->
   <!-- Check out more components here: http://getbootstrap.com/components/ -->
-  <div class="page-header">
+  <div class="page-header" id="page-header">
   
     <h1>Content Cubed Test App</h1>
 
