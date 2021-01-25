@@ -1,3 +1,12 @@
+//const functions = require('firebase-functions');
+//const cors = require('cors');
+
+/* exports.addMessage = functions.https.onRequest((req, res) => {
+  cors()(req, res, () => {
+    return res.json({status: 'ok'});
+  });
+}); */
+
 var express = require('express');
 var app = express();
 

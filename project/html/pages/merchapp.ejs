@@ -5,7 +5,23 @@
 <SCRIPT LANGUAGE=javascript>
 
   //access database
-  var dbRef = firebase.database().ref('data');
+  var dbRef = firebase.database().ref('TrueSet').limitToLast(1); //this pulls most recent day's data to define item list
+
+  const skus = [];
+
+  dbRef.once('value')
+  .then(function(snapshot) {
+    //console.log(snapshot)
+    snapshot.forEach(function(childSnapshot) {
+      var childData = childSnapshot.val();
+      var dl = childData['store'][0]['data'].length;
+      for (i = 0; i < dl; i++) {
+        //console.log(childData['store'][0]['data'][i]['UPC'])
+        skus.push(childData['store'][0]['data'][i]['UPC']);
+      }
+      });
+  });  
+
 
   function OnChange(dropdown)  {
     //exception handling for when dropdown list is removed
@@ -19,9 +35,6 @@
     }
     var SelValue = dropdown.options[myindex].value;
 
-    //access database
-    //var dbRef = firebase.database().ref('data');
-    
     //clear previously selected store data if present
     document.getElementById('clicker').innerHTML = "";
     document.getElementById('labels').innerHTML = "";
@@ -29,10 +42,11 @@
     document.getElementById('commentsHere').innerHTML = "";
 
     //get list of dbobject by Category
-    var query = dbRef.orderByChild("Category");
-
+    //var query = dbRef.orderByChild("Category");
+    //console.log(query)
+    
     var pushme = document.createElement("input");
-    pushme.id = "confirm"
+    pushme.id = "confirm";
     pushme.type = "button";
     pushme.value = "Done";
     pushme.onclick = OnClick;
@@ -44,7 +58,7 @@
     var para = document.createElement("h2");
     var para2 = document.createElement("h4");
     var para3 = document.createElement("h4");
-    para.innerHTML = "Product Name and Units Sold";
+    para.innerHTML = "Product Name (Units Received | Sold)";
     para2.innerHTML = "ON SHELF";
     para3.innerHTML = "IN STOCK";
     document.getElementById('labels').appendChild(para);
@@ -52,46 +66,143 @@
     document.getElementById('labels').appendChild(para2);
     //document.getElementById('headHere').appendChild(lnbreak);
 
-    let currcat = "";
-    //iterate through where store matches selected add products to list
-    //create list item, checkboxes and publish to UI.
-    query.once('value')
+    var dbRef = firebase.database().ref('TrueSet').limitToLast(7);
+    //finish this up !!!!!!!!!!!!
+    const prodlist = [];
+    const addedprod = [];
+    dbRef.once('value')
       .then(function(snapshot) {
         snapshot.forEach(function(childSnapshot) {
+          //console.log(childsnapshot.value)
           var key = childSnapshot.key;
+          console.log(key);
           var childData = childSnapshot.val();
-          var store = childData.Store;
-          var category = childData.Category;
-          var prodName = document.createElement("p");
+          //console.log(childData);
 
-          //build category labels
-          if (currcat != childData.Category) {
-              let catlabel = document.createElement("h3");
-              catlabel.innerHTML = childData.Category;
-              currcat = childData.Category;
-              document.getElementById('dataHere').appendChild(catlabel);
-            } else {
-              //do nothing;
+          //iterate through each childData set, create store + items container in prodlist, populate items
+          //updating sold/received values for each store
+          var dl = childData['store'].length;
+          //console.log(dl);
+          //console.log(SelValue);
+          for (i = 0; i < dl; i++) {
+            var store = childData['store'][i]["Store"];
+            //console.log(store)
+            if (store == SelValue) {
+              var il = childData['store'][i]['data'].length;
+              for (j = 0; j <il; j++) {
+              //console.log(il);
+                var upc = childData['store'][i]['data'][j]['UPC'];
+                //console.log(upc);
+                if ((skus.includes(upc)) && (!(addedprod.includes(upc)))) {
+                  addedprod.push(upc);
+                  console.log(addedprod.length);
+                  //if (childData['store'][i]['data'][j]['UPC'] not in prodlist['UPC'] 
+                  prodlist.push([childData['store'][i]['data'][j]['UPC'],
+                                childData['store'][i]['data'][j]['Category'],
+                                childData['store'][i]['data'][j]['Name'],
+                                childData['store'][i]['data'][j]['UnitRecieved'],
+                                childData['store'][i]['data'][j]['UnitSales'],
+                                childData['store'][i]['data'][j]['Subcategory']])
+                } else if (!(skus.includes(upc))) {
+                  //do nothing
+                } else {
+                  var plen = prodlist.length;
+                  console.log(plen);
+                  for (k = 0; k < plen; k++) {
+                    if (upc == prodlist[k][0]) {
+                      prodlist[k][3] += childData['store'][i]['data'][j]['UnitRecieved'];
+                      prodlist[k][4] += childData['store'][i]['data'][j]['UnitSales'];
+                      }
+                    }
+                  }
+                }  
+              }
             }
+          })    //prodlist populated
 
-          if (store == SelValue)  {
-            let item = childData.Name + " sold " + childData.UnitSales + "   . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ";
-            let ckbx = document.createElement("input");
-            ckbx.id = "slf"+childData.UPC;
-            ckbx.type = "checkbox";
-            let ckbx2 = document.createElement("input");
-            ckbx2.id = "stk"+childData.UPC;
-            ckbx2.type = "checkbox";
-            prodName.innerHTML = item;
-            prodName.setAttribute("child-key", childData.UPC);
-            prodName.setAttribute("name", childData.Name);
+    console.log(prodlist);
+
+    //build category & subcategory labels
+    let currcat = "";
+    let cursubcat = "";
+    
+    //iterate through where store matches selected add products to list
+    //create list item, checkboxes and publish to UI.
+    prodlen = prodlist.length;
+    console.log(prodlen);
+    for (i = 0; i < prodlen; i++) {         
+      if ((currcat != prodlist[i][1]) && (cursubcat != prodlist[i][5])) {
+        let catlabel = document.createElement("h3");
+        catlabel.innerHTML = prodlist[i][1];
+        currcat = prodlist[i][1];
+        document.getElementById('dataHere').appendChild(catlabel);
+
+        let subcatlabel = document.createElement("h3");
+        subcatlabel.innerHTML = prodlist[i][5];
+        cursubcat = prodlist[i][5];
+        document.getElementById('dataHere').appendChild(subcatlabel);
+
+        let item = prodlist[i][2] + " (" + prodlist[i][3] + " | " + prodlist[i][4] + ")   . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ";
+        //console.log(item);
+        let ckbx = document.createElement("input");
+        ckbx.id = "slf"+prodlist[i][0];
+        ckbx.type = "checkbox";
+        let ckbx2 = document.createElement("input");
+        ckbx2.id = "stk"+prodlist[i][0];
+        ckbx2.type = "checkbox";
+        let prodName = document.createElement("p");
+        prodName.innerHTML = item;
+        prodName.setAttribute("child-key", prodlist[i][0]);
+        prodName.setAttribute("name", prodlist[i][2]);
             
-            document.getElementById('dataHere').appendChild(ckbx);
-            document.getElementById('dataHere').appendChild(ckbx2);
-            document.getElementById('dataHere').appendChild(prodName);
-          } 
-        })
-      })
+        document.getElementById('dataHere').appendChild(ckbx);
+        document.getElementById('dataHere').appendChild(ckbx2);
+        document.getElementById('dataHere').appendChild(prodName);
+
+
+        } else if (cursubcat != prodlist[i][5]) {
+          let subcatlabel = document.createElement("h3");
+          subcatlabel.innerHTML = prodlist[i][5];
+          cursubcat = prodlist[i][5];
+          document.getElementById('dataHere').appendChild(subcatlabel);
+
+          let item = prodlist[i][2] + " (" + prodlist[i][3] + " | " + prodlist[i][4] + ")   . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ";
+          //console.log(item);
+          let ckbx = document.createElement("input");
+          ckbx.id = "slf"+prodlist[i][0];
+          ckbx.type = "checkbox";
+          let ckbx2 = document.createElement("input");
+          ckbx2.id = "stk"+prodlist[i][0];
+          ckbx2.type = "checkbox";
+          let prodName = document.createElement("p");
+          prodName.innerHTML = item;
+          prodName.setAttribute("child-key", prodlist[i][0]);
+          prodName.setAttribute("name", prodlist[i][2]);
+            
+          document.getElementById('dataHere').appendChild(ckbx);
+          document.getElementById('dataHere').appendChild(ckbx2);
+          document.getElementById('dataHere').appendChild(prodName);
+
+        } else {
+          let item = prodlist[i][2] + " (" + prodlist[i][3] + " | " + prodlist[i][4] + ")   . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ";
+          //console.log(item);
+          let ckbx = document.createElement("input");
+          ckbx.id = "slf"+prodlist[i][0];
+          ckbx.type = "checkbox";
+          let ckbx2 = document.createElement("input");
+          ckbx2.id = "stk"+prodlist[i][0];
+          ckbx2.type = "checkbox";
+          let prodName = document.createElement("p");
+          prodName.innerHTML = item;
+          prodName.setAttribute("child-key", prodlist[i][0]);
+          prodName.setAttribute("name", prodlist[i][2]);
+            
+          document.getElementById('dataHere').appendChild(ckbx);
+          document.getElementById('dataHere').appendChild(ckbx2);
+          document.getElementById('dataHere').appendChild(prodName);
+        }       
+      }         
+    })
 
     //create text inputs for comments
     var userId = firebase.auth().currentUser.uid;
@@ -176,7 +287,7 @@
 
     //publish new data for ordering view
     var pushme2 = document.createElement("input");
-    pushme2.id = "confirmorder"
+    pushme2.id = "confirmorder";
     pushme2.type = "button";
     pushme2.value = "Done";
     pushme2.onclick = OnClick2;
