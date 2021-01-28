@@ -437,8 +437,8 @@
 
     //push visit to database ref('visits')
 
-    //var dbRef = firebase.database().ref('visits');
-    //dbRef.push(dataobject);
+    var dbRef = firebase.database().ref('visits');
+    dbRef.push(dataobject);
 
     //log user out of firebase
     firebase.auth().signOut();
