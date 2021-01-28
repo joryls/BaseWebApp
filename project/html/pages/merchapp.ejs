@@ -340,6 +340,7 @@
     dataobject.push(vstore);
     dataobject.push(vuser);
     dataobject.push(vdate);
+    console.log(vcomm);
     dataobject.push(vcomm);
     dataobject.push(vprod);
     console.log(dataobject);
@@ -387,45 +388,58 @@
       //return(dataobject);
   }
 
-  var ordered = [];
+  const ordered = [];
   function OnClick2(button) {
     //collect ordered checks and add to dataObj
     //console.log(dataobject);
     var data = document.getElementById("dataHere");
     var dataprod = data.getElementsByTagName("p");
     var datalmts = data.getElementsByTagName("input");
+    
+    var cl = datalmts.length;
+    console.log(cl);
     var pl = dataprod.length;
-    console.log(pl);
+    //console.log(pl);
     var dl = dataobject[4].length;
-    console.log(dl);
+    //console.log(dl);
     //create array of ordered inputs
     
-    for (i = 0; i < pl; i++) {
+    for (i = 0; i < cl; i++) {
+      if (1 == 1) {
       var obj = { name: dataprod[i].getAttribute('name'),
                   product: dataprod[i].getAttribute('child-key'),
                   ordered: datalmts[i].checked};
       ordered.push(obj);
+      } else {
+        //do nothing
+      }
+    
     //console.log(ordered);
-
+    
     //add ordered t/f value to dataobject[4];
-/*     for (i=0; i<dl; i++) {
+    /* for (i=0; i<dl; i++) {
       if (dataobject[4][i]['instock'] == true) {
         dataobject[4][i]['ordered'] = false;
       } else {
-        for (j=0; j<pl; j++) {
-          if (dataobject[4][i]['product'] == ordered[j]['product']) {
-            dataobject[4][i]['ordered'] = ordered[j]['ordered'];
+      for (j=0; j<pl; j++) {
+        //console.log(dataobject[4][i]['product'])
+        //console.log(ordered[j]['product'])
+        if (dataobject[4][i]['product'] == ordered[j]['product']) {
+          dataobject[4][i]['ordered'] = ordered[j]['ordered'];
           }
         }
       }
     } */
     
     }
-    console.log(dataobject);
+    //console.log(ordered);
+    //console.log(dataobject);
 
     //push visit to database ref('visits')
-    var dbRef = firebase.database().ref('visits');
-    dbRef.push(dataobject);
+
+    //var dbRef = firebase.database().ref('visits');
+    //dbRef.push(dataobject);
+
     //log user out of firebase
     firebase.auth().signOut();
     //clear all elements
