@@ -5,23 +5,60 @@
 <SCRIPT LANGUAGE=javascript>
 
   //access database
-  var dbRef = firebase.database().ref('TrueSet').limitToLast(1); //this pulls most recent day's data to define item list
-
+  
+  //wrap in function then execute function
+  
   const skus = [];
+  const datestuff = [];
+  const promo = [];
+  const promoupc = [];
+  var vstore = ""
+  var vuser = ""
 
-  dbRef.once('value')
-  .then(function(snapshot) {
-    //console.log(snapshot)
-    snapshot.forEach(function(childSnapshot) {
-      var childData = childSnapshot.val();
-      var dl = childData['store'][0]['data'].length;
-      for (i = 0; i < dl; i++) {
-        //console.log(childData['store'][0]['data'][i]['UPC'])
-        skus.push(childData['store'][0]['data'][i]['UPC']);
-      }
+  function OnLoad() {
+    var dbRef = firebase.database().ref('TrueSet').limitToLast(1); //this pulls most recent day's data to define item list
+    dbRef.once('value')
+      .then(function(snapshot) {
+        snapshot.forEach(function(childSnapshot) {
+          var childData = childSnapshot.val();
+          //console.log(childData['store'][0]['data'][0]['DayNum']);
+          datestuff.push(childData['store'][0]['data'][0]['DayNum']);
+          var dl = childData['store'][0]['data'].length;
+          for (i = 0; i < dl; i++) {
+            skus.push(childData['store'][0]['data'][i]['UPC']);
+          }
+        });
+      });  
+
+    //load promo object here
+    var dbRef = firebase.database().ref('promo').orderByChild('upc');
+
+    dbRef.once('value')
+      .then(function(snapshot) {
+        var promoData = snapshot.val();
+        promo.push(promoData);
+        //console.log(promoData); 
       });
-  });  
 
+    console.log(promo);
+    console.log(promo.length);
+    console.log(skus);
+    console.log(skus.length);
+    console.log(datestuff);
+    console.log(datestuff.length)
+  
+    console.log(datestuff[0]);
+    daynum = datestuff[0];
+    console.log(daynum);
+
+    //go through promo and log any upc on sale today to promoupc
+    for (i=0; i < promo.length; i++) {
+      console.log(datestuff[0]);
+      if (datestuff[0] >= promo[i]['startnum'] && datestuff[0] <= promo[i]['endnum']) {
+        promoupc.push(promoData[i]['upc'])
+      }
+    }
+  }
 
   function OnChange(dropdown)  {
     //exception handling for when dropdown list is removed
@@ -34,7 +71,7 @@
          return;
     }
     var SelValue = dropdown.options[myindex].value;
-
+    vstore = SelValue;
     //clear previously selected store data if present
     document.getElementById('clicker').innerHTML = "";
     document.getElementById('labels').innerHTML = "";
@@ -52,7 +89,6 @@
     pushme.onclick = OnClick;
     document.getElementById('clicker').append(pushme);
     //pushme.onclick = OnClick();
-    
 
     var lnbreak = document.createElement("br");
     var para = document.createElement("h2");
@@ -67,7 +103,6 @@
     //document.getElementById('headHere').appendChild(lnbreak);
 
     var dbRef = firebase.database().ref('TrueSet').limitToLast(7);
-    //finish this up !!!!!!!!!!!!
     const prodlist = [];
     const addedprod = [];
     dbRef.once('value')
@@ -95,7 +130,7 @@
                 //console.log(upc);
                 if ((skus.includes(upc)) && (!(addedprod.includes(upc)))) {
                   addedprod.push(upc);
-                  console.log(addedprod.length);
+                  //console.log(addedprod.length);
                   //if (childData['store'][i]['data'][j]['UPC'] not in prodlist['UPC'] 
                   prodlist.push([childData['store'][i]['data'][j]['UPC'],
                                 childData['store'][i]['data'][j]['Category'],
@@ -107,7 +142,7 @@
                   //do nothing
                 } else {
                   var plen = prodlist.length;
-                  console.log(plen);
+                  //console.log(plen);
                   for (k = 0; k < plen; k++) {
                     if (upc == prodlist[k][0]) {
                       prodlist[k][3] += childData['store'][i]['data'][j]['UnitRecieved'];
@@ -119,8 +154,9 @@
               }
             }
           })    //prodlist populated
+          
 
-    console.log(prodlist);
+    //console.log(prodlist);
 
     //build category & subcategory labels
     let currcat = "";
@@ -128,8 +164,8 @@
     
     //iterate through where store matches selected add products to list
     //create list item, checkboxes and publish to UI.
-    prodlen = prodlist.length;
-    console.log(prodlen);
+    let prodlen = prodlist.length;
+    //console.log(prodlen);
     for (i = 0; i < prodlen; i++) {         
       if ((currcat != prodlist[i][1]) && (cursubcat != prodlist[i][5])) {
         let catlabel = document.createElement("h3");
@@ -142,47 +178,12 @@
         cursubcat = prodlist[i][5];
         document.getElementById('dataHere').appendChild(subcatlabel);
 
-        let item = prodlist[i][2] + " (" + prodlist[i][3] + " | " + prodlist[i][4] + ")   . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ";
-        //console.log(item);
-        let ckbx = document.createElement("input");
-        ckbx.id = "slf"+prodlist[i][0];
-        ckbx.type = "checkbox";
-        let ckbx2 = document.createElement("input");
-        ckbx2.id = "stk"+prodlist[i][0];
-        ckbx2.type = "checkbox";
-        let prodName = document.createElement("p");
-        prodName.innerHTML = item;
-        prodName.setAttribute("child-key", prodlist[i][0]);
-        prodName.setAttribute("name", prodlist[i][2]);
-            
-        document.getElementById('dataHere').appendChild(ckbx);
-        document.getElementById('dataHere').appendChild(ckbx2);
-        document.getElementById('dataHere').appendChild(prodName);
-
-
-        } else if (cursubcat != prodlist[i][5]) {
-          let subcatlabel = document.createElement("h3");
-          subcatlabel.innerHTML = prodlist[i][5];
-          cursubcat = prodlist[i][5];
-          document.getElementById('dataHere').appendChild(subcatlabel);
-
-          let item = prodlist[i][2] + " (" + prodlist[i][3] + " | " + prodlist[i][4] + ")   . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ";
-          //console.log(item);
-          let ckbx = document.createElement("input");
-          ckbx.id = "slf"+prodlist[i][0];
-          ckbx.type = "checkbox";
-          let ckbx2 = document.createElement("input");
-          ckbx2.id = "stk"+prodlist[i][0];
-          ckbx2.type = "checkbox";
-          let prodName = document.createElement("p");
-          prodName.innerHTML = item;
-          prodName.setAttribute("child-key", prodlist[i][0]);
-          prodName.setAttribute("name", prodlist[i][2]);
-            
-          document.getElementById('dataHere').appendChild(ckbx);
-          document.getElementById('dataHere').appendChild(ckbx2);
-          document.getElementById('dataHere').appendChild(prodName);
-
+        //define sales price element and include in 'item' object when applicable (do 3 places below)
+        //console.log(promo);
+        if (prodlist[i][0] in promoupc) { //need to do date check when populating promoupc
+          //get sales price for upc
+          //create item object below 
+          //replicate rest of code for nonpromo items
         } else {
           let item = prodlist[i][2] + " (" + prodlist[i][3] + " | " + prodlist[i][4] + ")   . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ";
           //console.log(item);
@@ -200,12 +201,66 @@
           document.getElementById('dataHere').appendChild(ckbx);
           document.getElementById('dataHere').appendChild(ckbx2);
           document.getElementById('dataHere').appendChild(prodName);
+        }
+
+        } else if (cursubcat != prodlist[i][5]) {
+          let subcatlabel = document.createElement("h3");
+          subcatlabel.innerHTML = prodlist[i][5];
+          cursubcat = prodlist[i][5];
+          document.getElementById('dataHere').appendChild(subcatlabel);
+
+          if (prodlist[i][0] in promoupc) {
+            //get sales price for upc
+            //create item object below 
+            //replicate rest of code for nonpromo items
+          } else {
+            let item = prodlist[i][2] + " (" + prodlist[i][3] + " | " + prodlist[i][4] + ")   . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ";
+            //console.log(item);
+            let ckbx = document.createElement("input");
+            ckbx.id = "slf"+prodlist[i][0];
+            ckbx.type = "checkbox";
+            let ckbx2 = document.createElement("input");
+            ckbx2.id = "stk"+prodlist[i][0];
+            ckbx2.type = "checkbox";
+            let prodName = document.createElement("p");
+            prodName.innerHTML = item;
+            prodName.setAttribute("child-key", prodlist[i][0]);
+            prodName.setAttribute("name", prodlist[i][2]);
+            
+            document.getElementById('dataHere').appendChild(ckbx);
+            document.getElementById('dataHere').appendChild(ckbx2);
+            document.getElementById('dataHere').appendChild(prodName);
+          }
+        } else {
+          if (prodlist[i][0] in promoupc) {
+            //get sales price for upc
+            //create item object below 
+            //replicate rest of code for nonpromo items
+          } else {
+            let item = prodlist[i][2] + " (" + prodlist[i][3] + " | " + prodlist[i][4] + ")   . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ";
+            //console.log(item);
+            let ckbx = document.createElement("input");
+            ckbx.id = "slf"+prodlist[i][0];
+            ckbx.type = "checkbox";
+            let ckbx2 = document.createElement("input");
+            ckbx2.id = "stk"+prodlist[i][0];
+            ckbx2.type = "checkbox";
+            let prodName = document.createElement("p");
+            prodName.innerHTML = item;
+            prodName.setAttribute("child-key", prodlist[i][0]);
+            prodName.setAttribute("name", prodlist[i][2]);
+            
+            document.getElementById('dataHere').appendChild(ckbx);
+            document.getElementById('dataHere').appendChild(ckbx2);
+            document.getElementById('dataHere').appendChild(prodName);
+          }
         }       
       }         
     })
 
     //create text inputs for comments
     var userId = firebase.auth().currentUser.uid;
+    vuser = userId;
 
     var priceComm = document.createElement("input");
     priceComm.id = "price"+userId;
@@ -228,44 +283,50 @@
     document.getElementById('commentsHere').appendChild(priceComm);
     document.getElementById('commentsHere').appendChild(para5);
     document.getElementById('commentsHere').appendChild(presComm);
-    }
-  
-  function OnClick2(button) {
-    //log user out of firebase
-    firebase.auth().signOut();
-    //clear all elements
-    document.getElementById('storelist').innerHTML = "You are logged out, you may close the app.";
-    document.getElementById('clicker').innerHTML = "";
-    document.getElementById('labels').innerHTML = "";
-    document.getElementById('dataHere').innerHTML = "";
-    document.getElementById('commentsHere').innerHTML = "";
-    
+
+    return(SelValue);
+    return(userID);
   }
+  
+  var dataobject = [];
 
   function OnClick(button) {
-    //declare func variables
-    /* var dataobject = {"schema":{"fields":[{"name":"product","type":"string"},
-      {"name":"onshelf","type":"boolean"},
-      {"name":"instock","type":"boolean"}],"pandas_version":"0.20.0"},"visit":[]}; */
 
-    /* const dropdown = document.getElementById("storelist");  
-    var myindex  = dropdown.selectedIndex;
-    var SelValue = dropdown.options[myindex].value; */  
-
-    var dataobject = [];
+    //var vstore = SelValue;
+    console.log(vstore);
+    //var vuser = userId;
+    console.log(vuser);
+    var vcomm = [];
+    var vprod = [];
+    var vdate = new Date();
+    
+    
+    
+    //console.log(dataobject);
 
     var data = document.getElementById("dataHere");
     var comm = document.getElementById("commentsHere");
 
     var dataprod = data.getElementsByTagName("p");
+    //console.dir(dataprod);
     var datalmts = data.getElementsByTagName("input");
+    //console.dir(datalmts);
     var commlmts = comm.getElementsByTagName("input");
+    //console.dir(commlmts);
     var pl = dataprod.length;
     var dl = datalmts.length;
     var cl = commlmts.length;
 
-    //collect input data in object maybe JSON???
+    //collect input data in object
     //access html elments, extract contained data, and arrange
+    
+    //add comments to data obj under visit level with prod details in sub object
+    for (i = 0; i < cl; i++) {
+      let obj = { id: commlmts[i].id,
+                  comment: commlmts[i].value};
+      vcomm.push(obj);
+    }
+
     let j = 0;
     for (i = 0; i < pl; i++) {
       var obj = { name: dataprod[i].getAttribute('name'),
@@ -273,10 +334,15 @@
                   instock: datalmts[j].checked,
                   onshelf: datalmts[j+1].checked };
                   j += 2
-      dataobject.push(obj);
+      vprod.push(obj);
     }
     //console.log(datalmts);
-    //console.log(dataobject);
+    dataobject.push(vstore);
+    dataobject.push(vuser);
+    dataobject.push(vdate);
+    dataobject.push(vcomm);
+    dataobject.push(vprod);
+    console.log(dataobject);
  
     //clear previous view data
     document.getElementById('storelist').innerHTML = "Products to order:";
@@ -301,30 +367,82 @@
     document.getElementById('labels').appendChild(para);
     document.getElementById('labels').appendChild(para3);
     
-    var pl = dataobject.length
+    var pl = dataobject[4].length
     for (i = 0; i < pl; i++) {
       //console.log(item);
-      if (dataobject[i].instock == false)  {
-            let line = dataobject[i].name + " (" + dataobject[i].product + ")   . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ";
-            let prodName = document.createElement("p");
-            let ckbx = document.createElement("input");
-            let linebreak = document.createElement("br");
-            ckbx.id = "ord"+dataobject[i].product;
-            ckbx.type = "checkbox";
-            prodName.innerHTML = line;
-            prodName.setAttribute("child-key", dataobject[i].product);
-            prodName.setAttribute("name", dataobject[i].name);
-            document.getElementById('dataHere').appendChild(ckbx);
-            document.getElementById('dataHere').appendChild(prodName);
-          } 
-        }
+      if (dataobject[4][i].instock == false)  {
+        let line = dataobject[4][i].name + " (" + dataobject[4][i].product + ")   . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ";
+        let prodName = document.createElement("p");
+        let ckbx = document.createElement("input");
+        let linebreak = document.createElement("br");
+        ckbx.id = "ord"+dataobject[4][i].product;
+        ckbx.type = "checkbox";
+        prodName.innerHTML = line;
+        prodName.setAttribute("child-key", dataobject[4][i].product);
+        prodName.setAttribute("name", dataobject[4][i].name);
+        document.getElementById('dataHere').appendChild(ckbx);
+        document.getElementById('dataHere').appendChild(prodName);
+      } 
+    }
+      //return(dataobject);
+  }
 
+  var ordered = [];
+  function OnClick2(button) {
+    //collect ordered checks and add to dataObj
+    //console.log(dataobject);
+    var data = document.getElementById("dataHere");
+    var dataprod = data.getElementsByTagName("p");
+    var datalmts = data.getElementsByTagName("input");
+    var pl = dataprod.length;
+    console.log(pl);
+    var dl = dataobject[4].length;
+    console.log(dl);
+    //create array of ordered inputs
+    
+    for (i = 0; i < pl; i++) {
+      var obj = { name: dataprod[i].getAttribute('name'),
+                  product: dataprod[i].getAttribute('child-key'),
+                  ordered: datalmts[i].checked};
+      ordered.push(obj);
+    //console.log(ordered);
+
+    //add ordered t/f value to dataobject[4];
+/*     for (i=0; i<dl; i++) {
+      if (dataobject[4][i]['instock'] == true) {
+        dataobject[4][i]['ordered'] = false;
+      } else {
+        for (j=0; j<pl; j++) {
+          if (dataobject[4][i]['product'] == ordered[j]['product']) {
+            dataobject[4][i]['ordered'] = ordered[j]['ordered'];
+          }
+        }
+      }
+    } */
+    
+    }
+    console.log(dataobject);
+
+    //push visit to database ref('visits')
+    var dbRef = firebase.database().ref('visits');
+    dbRef.push(dataobject);
+    //log user out of firebase
+    firebase.auth().signOut();
+    //clear all elements
+    document.getElementById('storelist').innerHTML = "You are logged out, you may close the app.";
+    document.getElementById('clicker').innerHTML = "";
+    document.getElementById('labels').innerHTML = "";
+    document.getElementById('dataHere').innerHTML = "";
+    document.getElementById('commentsHere').innerHTML = "";
+    
+  }
     //access database
     
 
     //write data to db
 
-  }
+  OnLoad();
+  
 </SCRIPT>
 
 </head>
