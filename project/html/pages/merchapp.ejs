@@ -4,10 +4,6 @@
 
 <SCRIPT LANGUAGE=javascript>
 
-  //access database
-  
-  //wrap in function then execute function
-  
   const skus = [];
   const datestuff = [];
   const promo = [];
@@ -40,16 +36,16 @@
         //console.log(promoData); 
       });
 
-    console.log(promo);
-    console.log(promo.length);
-    console.log(skus);
-    console.log(skus.length);
-    console.log(datestuff);
-    console.log(datestuff.length)
+    //console.log(promo);
+    //console.log(promo.length);
+    //console.log(skus);
+    //console.log(skus.length);
+    //console.log(datestuff);
+    //console.log(datestuff.length)
   
-    console.log(datestuff[0]);
+    //console.log(datestuff[0]);
     daynum = datestuff[0];
-    console.log(daynum);
+    //console.log(daynum);
 
     //go through promo and log any upc on sale today to promoupc
     for (i=0; i < promo.length; i++) {
@@ -253,14 +249,16 @@
             document.getElementById('dataHere').appendChild(ckbx);
             document.getElementById('dataHere').appendChild(ckbx2);
             document.getElementById('dataHere').appendChild(prodName);
-          }
-        }       
-      }         
-    })
+            }
+          }       
+        }         
+        })
 
     //create text inputs for comments
     var userId = firebase.auth().currentUser.uid;
-    vuser = userId;
+    var userEmail = firebase.auth().currentUser.email;
+    //console.log(userEmail);
+    vuser = userEmail;
 
     var priceComm = document.createElement("input");
     priceComm.id = "price"+userId;
@@ -292,27 +290,25 @@
 
   function OnClick(button) {
 
-    //var vstore = SelValue;
     console.log(vstore);
-    //var vuser = userId;
     console.log(vuser);
     var vcomm = [];
     var vprod = [];
-    var vdate = new Date();
-    
-    
-    
+    var cdate = new Date();
+    var cDay = cdate.getDate();
+    var cMonth = cdate.getMonth() + 1;
+    var cYear = cdate.getFullYear();
+    var vdate = (cMonth +"/"+cDay+"/"+cYear);
+
+        
     //console.log(dataobject);
 
     var data = document.getElementById("dataHere");
     var comm = document.getElementById("commentsHere");
 
     var dataprod = data.getElementsByTagName("p");
-    //console.dir(dataprod);
     var datalmts = data.getElementsByTagName("input");
-    //console.dir(datalmts);
     var commlmts = comm.getElementsByTagName("input");
-    //console.dir(commlmts);
     var pl = dataprod.length;
     var dl = datalmts.length;
     var cl = commlmts.length;
@@ -340,10 +336,10 @@
     dataobject.push(vstore);
     dataobject.push(vuser);
     dataobject.push(vdate);
-    console.log(vcomm);
+    //console.log(vcomm);
     dataobject.push(vcomm);
     dataobject.push(vprod);
-    console.log(dataobject);
+    //console.log(dataobject);
  
     //clear previous view data
     document.getElementById('storelist').innerHTML = "Products to order:";
@@ -397,7 +393,7 @@
     var datalmts = data.getElementsByTagName("input");
     
     var cl = datalmts.length;
-    console.log(cl);
+    //console.log(cl);
     var pl = dataprod.length;
     //console.log(pl);
     var dl = dataobject[4].length;
@@ -405,19 +401,16 @@
     //create array of ordered inputs
     
     for (i = 0; i < cl; i++) {
-      if (1 == 1) {
       var obj = { name: dataprod[i].getAttribute('name'),
                   product: dataprod[i].getAttribute('child-key'),
                   ordered: datalmts[i].checked};
       ordered.push(obj);
-      } else {
-        //do nothing
-      }
+    }
     
     //console.log(ordered);
     
     //add ordered t/f value to dataobject[4];
-    /* for (i=0; i<dl; i++) {
+    for (i=0; i<dl; i++) {
       if (dataobject[4][i]['instock'] == true) {
         dataobject[4][i]['ordered'] = false;
       } else {
@@ -429,19 +422,17 @@
           }
         }
       }
-    } */
-    
     }
     //console.log(ordered);
-    //console.log(dataobject);
+    console.log(dataobject);
 
     //push visit to database ref('visits')
 
-    var dbRef = firebase.database().ref('visits');
-    dbRef.push(dataobject);
+    //var dbRef = firebase.database().ref('visits');
+    //dbRef.push(dataobject);
 
     //log user out of firebase
-    firebase.auth().signOut();
+    //firebase.auth().signOut();
     //clear all elements
     document.getElementById('storelist').innerHTML = "You are logged out, you may close the app.";
     document.getElementById('clicker').innerHTML = "";
