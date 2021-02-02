@@ -23,25 +23,19 @@
       });  
 
     //load promo object here
-    var promo = [];
+    var promo = {};
     var promoupc = [];
     var dbRef = firebase.database().ref('promo').orderByChild('upc');
 
     dbRef.once('value')
       .then(function(snapshot) {
         var promoData = snapshot.val();
-        //console.log(promoData);
-        //let promo = promoData;
-        //console.log(promo);
-        //go through promo and log any upc on sale today to promoupc
         var pl = promoData.length;
-        //console.log(pl);
         var daynum = datestuff[0];
         for (i=0; i < pl; i++) {
-          //console.log(daynum);
           if (datestuff[0] >= promoData[i]['startnum'] && datestuff[0] <= promoData[i]['endnum']) {
             promoupc.push(promoData[i]['upc']);
-            promo.push([promoData[i]['upc'], promoData[i]['startnum'], promoData[i]['endnum'], promoData[i]['saleprice']]);
+            promo[promoData[i]['upc']] = promoData[i]['saleprice'];
             }
           }
         });
@@ -154,15 +148,27 @@
         cursubcat = prodlist[i][5];
         document.getElementById('dataHere').appendChild(subcatlabel);
 
-        //define sales price element and include in 'item' object when applicable (do 3 places below)
-        if (prodlist[i][0] in promoupc) {
-          //console.log("it's on sale")
-          //get sales price for upc
-          //create item object below 
-          //replicate rest of code for nonpromo items
+        //define sales price element and include in 'item' object when applicable        
+        if (promoupc.includes(prodlist[i][0])) {
+          price = promo[prodlist[i][0]]
+          //create promo item object below 
+          let item = prodlist[i][2] + " " + prodlist[i][6] + " " + prodlist[i][7] + " (" + prodlist[i][3] + " | " + prodlist[i][4] + ") PROMO: " + price +"   . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ";
+          let ckbx = document.createElement("input");
+          ckbx.id = "slf"+prodlist[i][0];
+          ckbx.type = "checkbox";
+          let ckbx2 = document.createElement("input");
+          ckbx2.id = "stk"+prodlist[i][0];
+          ckbx2.type = "checkbox";
+          let prodName = document.createElement("h6");
+          prodName.innerHTML = item;
+          prodName.setAttribute("child-key", prodlist[i][0]);
+          prodName.setAttribute("name", prodlist[i][2]);
+            
+          document.getElementById('dataHere').appendChild(ckbx);
+          document.getElementById('dataHere').appendChild(ckbx2);
+          document.getElementById('dataHere').appendChild(prodName);
         } else {
           let item = prodlist[i][2] + " " + prodlist[i][6] + " " + prodlist[i][7] + " (" + prodlist[i][3] + " | " + prodlist[i][4] + ")   . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ";
-          //console.log(item);
           let ckbx = document.createElement("input");
           ckbx.id = "slf"+prodlist[i][0];
           ckbx.type = "checkbox";
@@ -185,13 +191,26 @@
           cursubcat = prodlist[i][5];
           document.getElementById('dataHere').appendChild(subcatlabel);
 
-          if (prodlist[i][0] in promoupc) {
-            //get sales price for upc
-            //create item object below 
-            //replicate rest of code for nonpromo items
+          if (promoupc.includes(prodlist[i][0])) {
+            price = promo[prodlist[i][0]]
+            //create promo item object below 
+            let item = prodlist[i][2] + " " + prodlist[i][6] + " " + prodlist[i][7] + " (" + prodlist[i][3] + " | " + prodlist[i][4] + ") PROMO: " + price +"   . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ";
+            let ckbx = document.createElement("input");
+            ckbx.id = "slf"+prodlist[i][0];
+            ckbx.type = "checkbox";
+            let ckbx2 = document.createElement("input");
+            ckbx2.id = "stk"+prodlist[i][0];
+            ckbx2.type = "checkbox";
+            let prodName = document.createElement("h6");
+            prodName.innerHTML = item;
+            prodName.setAttribute("child-key", prodlist[i][0]);
+            prodName.setAttribute("name", prodlist[i][2]);
+            
+            document.getElementById('dataHere').appendChild(ckbx);
+            document.getElementById('dataHere').appendChild(ckbx2);
+            document.getElementById('dataHere').appendChild(prodName);
           } else {
             let item = prodlist[i][2] + " " + prodlist[i][6] + " " + prodlist[i][7] + " (" + prodlist[i][3] + " | " + prodlist[i][4] + ")   . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ";
-            //console.log(item);
             let ckbx = document.createElement("input");
             ckbx.id = "slf"+prodlist[i][0];
             ckbx.type = "checkbox";
@@ -208,10 +227,24 @@
             document.getElementById('dataHere').appendChild(prodName);
           }
         } else {
-          if (prodlist[i][0] in promoupc) {
-            //get sales price for upc
-            //create item object below 
-            //replicate rest of code for nonpromo items
+          if (promoupc.includes(prodlist[i][0])) {
+            price = promo[prodlist[i][0]]
+            //create promo item object below 
+            let item = prodlist[i][2] + " " + prodlist[i][6] + " " + prodlist[i][7] + " (" + prodlist[i][3] + " | " + prodlist[i][4] + ") PROMO: " + price +"   . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ";
+            let ckbx = document.createElement("input");
+            ckbx.id = "slf"+prodlist[i][0];
+            ckbx.type = "checkbox";
+            let ckbx2 = document.createElement("input");
+            ckbx2.id = "stk"+prodlist[i][0];
+            ckbx2.type = "checkbox";
+            let prodName = document.createElement("h6");
+            prodName.innerHTML = item;
+            prodName.setAttribute("child-key", prodlist[i][0]);
+            prodName.setAttribute("name", prodlist[i][2]);
+            
+            document.getElementById('dataHere').appendChild(ckbx);
+            document.getElementById('dataHere').appendChild(ckbx2);
+            document.getElementById('dataHere').appendChild(prodName);
           } else {
             let item = prodlist[i][2] + " " + prodlist[i][6] + " " + prodlist[i][7] + " (" + prodlist[i][3] + " | " + prodlist[i][4] + ")   . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ";
             let ckbx = document.createElement("input");
@@ -242,13 +275,11 @@
     priceComm.id = "price";
     priceComm.cols = 120;
     priceComm.rows = 3;
-    //priceComm.autofocus = true;
 
     var presComm = document.createElement("textarea");
     presComm.id = "pres";
     presComm.cols = 120;
     presComm.rows = 3;
-    //presComm.autofocus = true;
     
     var para4 = document.createElement("h2");
     var para5 = document.createElement("h2");
@@ -259,9 +290,6 @@
     document.getElementById('commentsHere').appendChild(priceComm);
     document.getElementById('commentsHere').appendChild(para5);
     document.getElementById('commentsHere').appendChild(presComm);
-
-    //return([SelValue, userEmail]);
-    //return(userID);
   }
   
 
@@ -269,8 +297,6 @@
 
   function OnClick(button) {
 
-    //console.log(vstore);
-    //console.log(vuser);
     var vcomm = [];
     var vprod = [];
     var cdate = new Date();
@@ -286,7 +312,6 @@
     var pl = dataprod.length;
     var dl = datalmts.length;
     var cl = commlmts.length;
-    //console.log(commlmts);
 
     //collect input data in object
     //access html elments, extract contained data, and arrange
@@ -294,7 +319,6 @@
     for (i = 0; i < cl; i++) {
       let obj = { id: commlmts[i].id,
                   comment: commlmts[i].value};
-      //console.log(obj);
       vcomm.push(obj);
     }
 
@@ -413,22 +437,14 @@
     //close browser tab
 
   }
-  //console.log('before call');
   let output = OnLoad();
-  //console.log('after call'); return [skus, datestuff, promo, promoupc]
+  //returns [skus, datestuff, promo, promoupc]
   //console.log(output);
   var skus = output[0];
-  //console.log(skus);
-  //console.log(skus.length);
   var datestuff = output[1];
   var daynum = datestuff[0];
-  //console.log(datestuff);
-  //console.log(datestuff.length)
-  //console.log(datestuff[0]);
-  //console.log(daynum);
-  var promoupc = output[2];
-  //console.log(promoupc);
-  //console.log(promoupc[0])
+  var promo = output[2];
+  var promoupc = output[3];
   
 </SCRIPT>
 
