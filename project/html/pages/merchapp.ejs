@@ -126,9 +126,6 @@
             }
           })    //prodlist populated
           
-
-    //console.log(prodlist);
-
     //build category & subcategory labels
     let currcat = "";
     let cursubcat = "";
@@ -152,7 +149,7 @@
         if (promoupc.includes(prodlist[i][0])) {
           price = promo[prodlist[i][0]]
           //create promo item object below 
-          let item = prodlist[i][2] + " " + prodlist[i][6] + " " + prodlist[i][7] + " (" + prodlist[i][3] + " | " + prodlist[i][4] + ") PROMO: " + price +"   . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ";
+          let item = prodlist[i][2] + " " + prodlist[i][6] + " " + prodlist[i][7] + " (" + prodlist[i][3] + " | " + prodlist[i][4] + ") PROMO: " + price +"   . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ";
           let ckbx = document.createElement("input");
           ckbx.id = "slf"+prodlist[i][0];
           ckbx.type = "checkbox";
@@ -194,7 +191,7 @@
           if (promoupc.includes(prodlist[i][0])) {
             price = promo[prodlist[i][0]]
             //create promo item object below 
-            let item = prodlist[i][2] + " " + prodlist[i][6] + " " + prodlist[i][7] + " (" + prodlist[i][3] + " | " + prodlist[i][4] + ") PROMO: " + price +"   . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ";
+            let item = prodlist[i][2] + " " + prodlist[i][6] + " " + prodlist[i][7] + " (" + prodlist[i][3] + " | " + prodlist[i][4] + ") PROMO: " + price +"   . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ";
             let ckbx = document.createElement("input");
             ckbx.id = "slf"+prodlist[i][0];
             ckbx.type = "checkbox";
@@ -230,7 +227,7 @@
           if (promoupc.includes(prodlist[i][0])) {
             price = promo[prodlist[i][0]]
             //create promo item object below 
-            let item = prodlist[i][2] + " " + prodlist[i][6] + " " + prodlist[i][7] + " (" + prodlist[i][3] + " | " + prodlist[i][4] + ") PROMO: " + price +"   . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ";
+            let item = prodlist[i][2] + " " + prodlist[i][6] + " " + prodlist[i][7] + " (" + prodlist[i][3] + " | " + prodlist[i][4] + ") PROMO: " + price +"   . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ";
             let ckbx = document.createElement("input");
             ckbx.id = "slf"+prodlist[i][0];
             ckbx.type = "checkbox";
@@ -378,8 +375,6 @@
     }
   }
 
-  //console.log(dataobject);
-
   const ordered = [];
   function OnClick2(button) {
     //collect ordered checks and add to dataObj
@@ -398,8 +393,6 @@
       ordered.push(obj);
     }
     
-    //console.log(ordered);
-    
     //add ordered t/f value to dataobject[4] (items);
     for (i=0; i<dl; i++) {
       if (dataobject[4][i]['tostock'] == false) {
@@ -412,34 +405,119 @@
         }
       }
     }
-    //console.log(ordered);
-    //console.log(dataobject);
+
+    //clear all elements
+    document.getElementById('storelist').innerHTML = "";
+    document.getElementById('clicker').innerHTML = "";
+    document.getElementById('labels').innerHTML = "";
+    document.getElementById('dataHere').innerHTML = "";
+    document.getElementById('commentsHere').innerHTML = "";
+
+    //build summary view here with onclick3 button
+    var pushme = document.createElement("input");
+    pushme.id = "confirm";
+    pushme.type = "button";
+    pushme.value = "Close & Submit";
+    pushme.onclick = OnClick3;
+    document.getElementById('clicker').append(pushme);
+
+    document.getElementById('labels').append(dataobject[0] + ' Visit Summary');
+
+    //add up checkboxes for summary
+    var dl = dataobject[4].length;
+    var pdct = 0;
+    var tsct = 0;
+    var toct = 0;
+    var odct = 0;
+    for (i=0; i<dl; i++) {
+      pdct += 1;
+      if (dataobject[4][i]['toshelf'] == true) {
+        tsct += 1;
+        }
+      if (dataobject[4][i]['tostock'] == true) {
+        toct += 1;
+        }
+      if (dataobject[4][i]['ordered'] == true) {
+        odct += 1;
+        }
+      }
+    var sumline = document.createElement("p");
+    var sumline2 = document.createElement("p");
+    var sumline3 = document.createElement("p");
+    sumline.innerHTML = tsct + ' of ' + pdct + ' products needed shelving.'
+    document.getElementById('dataHere').append(sumline);
+    sumline2.innerHTML = toct + ' of ' + pdct + ' products needed to be ordered.'
+    document.getElementById('dataHere').append(sumline2);
+    sumline3.innerHTML = odct + ' of ' + toct + ' products were ordered.'
+    document.getElementById('dataHere').append(sumline3);
+
+    var priceline = document.createElement("p");
+    priceline.innerHTML = 'Pricing issues noted, update if needed';
+    var priceComm = document.createElement("textarea");
+    priceComm.id = "price";
+    priceComm.cols = 120;
+    priceComm.rows = 3;
+    priceComm.value = dataobject[3][0]['comment'];
+
+    var presline = document.createElement("p");
+    presline.innerHTML = 'Presentation issues noted, update if needed';
+    var presComm = document.createElement("textarea");
+    presComm.id = "pres";
+    presComm.cols = 120;
+    presComm.rows = 3;
+    presComm.value = dataobject[3][1]['comment'];
+
+    var linebreak = document.createElement("br");
+
+    document.getElementById('dataHere').append(linebreak);
+    document.getElementById('dataHere').append(linebreak);
+    document.getElementById('dataHere').append(priceline);
+    document.getElementById('dataHere').append(priceComm);
+    document.getElementById('dataHere').append(presline);
+    document.getElementById('dataHere').append(presComm);
+    
+  }
+
+  function OnClick3(button) {
+    //collect edited comments and add to dataObj
+    var commlmts = document.getElementsByTagName("textarea");
+    var cl = commlmts.length;
+    var cedit = []
+
+    //create array of updated comments (2 items)
+    for (i = 0; i < cl; i++) {
+      let obj = { id: commlmts[i].id,
+                  comment: commlmts[i].value};
+      cedit.push(obj);
+    }
+
+    //update data obj comments for push to database
+    dataobject[3][0]['comment'] = cedit[0]['comment'];
+    dataobject[3][1]['comment'] = cedit[1]['comment'];
 
     //push visit to database ref('visits')
     var dbRef = firebase.database().ref('visits');
     dbRef.push(dataobject); //turn on/off for testing as needed
 
     //log user out of firebase
-    //firebase.auth().signOut();
+    firebase.auth().signOut();
 
-    //clear all elements 
-    document.getElementById('storelist').innerHTML = "You are logged out, you may close the app.";
+    //clear elements provide link to app login
+    document.getElementById('storelist').innerHTML = 'Close browser or <a href="https://immense-forest-29972.herokuapp.com/">relaunch app</a>';
     document.getElementById('clicker').innerHTML = "";
     document.getElementById('labels').innerHTML = "";
     document.getElementById('dataHere').innerHTML = "";
     document.getElementById('commentsHere').innerHTML = "";
-    
-    //add visit summary with editable comments
-        
-    //log user out of firebase
-    //firebase.auth().signOut();
 
-    //close browser tab
+
+    //close app TO FIGURE OUT DOWN THE LINE
+
+    //process.kill(process.pid, 'SIGTERM');
 
   }
+
   let output = OnLoad();
   //returns [skus, datestuff, promo, promoupc]
-  //console.log(output);
   var skus = output[0];
   var datestuff = output[1];
   var daynum = datestuff[0];
