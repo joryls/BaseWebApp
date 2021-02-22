@@ -5,6 +5,17 @@
 <SCRIPT LANGUAGE=javascript>
 
   function OnLoad() {
+    //check for user login id and return to login if not present
+    try {
+      //let userTest = firebase.auth().currentUser.uid;
+      //console.log('userTest');
+    }
+
+    catch ( e ) {
+      //window.location.replace("https://immense-forest-29972.herokuapp.com/");
+      //window.location.replace("http://localhost:5000/")
+      //console.log('error');
+    }
 
     var skus = [];
     var datestuff = [];
@@ -323,7 +334,7 @@
     for (i = 0; i < pl; i++) {
       var obj = { name: dataprod[i].getAttribute('name'),
                   product: dataprod[i].getAttribute('child-key'),
-                  tostock: datalmts[j].checked,
+                  toorder: datalmts[j].checked,
                   toshelf: datalmts[j+1].checked };
                   j += 2
       vprod.push(obj);
@@ -359,7 +370,7 @@
     
     var pl = dataobject[4].length
     for (i = 0; i < pl; i++) {
-      if (dataobject[4][i].tostock == true)  {
+      if (dataobject[4][i].toorder == true)  {
         let line = dataobject[4][i].name + " (" + dataobject[4][i].product + ")   . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ";
         let prodName = document.createElement("p");
         let ckbx = document.createElement("input");
@@ -395,7 +406,7 @@
     
     //add ordered t/f value to dataobject[4] (items);
     for (i=0; i<dl; i++) {
-      if (dataobject[4][i]['tostock'] == false) {
+      if (dataobject[4][i]['toorder'] == false) {
         dataobject[4][i]['ordered'] = false;
       } else {
       for (j=0; j<pl; j++) {
@@ -434,7 +445,7 @@
       if (dataobject[4][i]['toshelf'] == true) {
         tsct += 1;
         }
-      if (dataobject[4][i]['tostock'] == true) {
+      if (dataobject[4][i]['toorder'] == true) {
         toct += 1;
         }
       if (dataobject[4][i]['ordered'] == true) {
@@ -497,6 +508,7 @@
 
     //push visit to database ref('visits')
     var dbRef = firebase.database().ref('visits');
+    //console.log(dataobject);
     dbRef.push(dataobject); //turn on/off for testing as needed
 
     //log user out of firebase
@@ -516,6 +528,7 @@
 
   }
 
+  //let userTest = firebase.auth().currentUser.email;
   let output = OnLoad();
   //returns [skus, datestuff, promo, promoupc]
   var skus = output[0];
@@ -533,7 +546,7 @@
   <!-- Check out more components here: http://getbootstrap.com/components/ -->
   <div class="page-header" id="page-header">
   
-    <h1>storelevel Test App</h1>
+    <h1>storelevel.app</h1>
 
     <form id="clicker">
 
